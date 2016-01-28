@@ -80,18 +80,20 @@ var grabRssFeed = function(url, callback, cacheBust, limit) {
         var now = new Date();
         var cafe = data.days[0].cafes[key];
         var cafeElement = $("li[data-bamco-id=\"" + key + "\"]");
+        
+        // Diner Hours  
         if (key == 512) {
           if (!(cafe.dayparts) || !(cafe.dayparts[0]) || cafe.dayparts[0].length == 0) {
             if (((now.getDay() == 0 || now.getDay() == 6) &&
                 (now.getHours > 15))) {
               cafeElement.find(".open-indicator").addClass("open");
-              cafeElement.find(".dining-hall-block .hours-text").text("3:00 - 12:00");
+              cafeElement.find(".dining-hall-block .hours-text").text("3:00pm - 12:00am");
             } else if (now.getDay() != 0 && now.getDay() != 6 && (now.getHours() > 9)) {
               cafeElement.find(".open-indicator").addClass("open");
-              cafeElement.find(".dining-hall-block .hours-text").text("9:00 - 12:00");
+              cafeElement.find(".dining-hall-block .hours-text").text("9:00am - 12:00pm");
             } else {
               cafeElement.find(".open-indicator").addClass("closed");
-              cafeElement.find(".dining-hall-block .hours-text").text("3:00 - 12:00");
+              cafeElement.find(".dining-hall-block .hours-text").text("3:00pm - 12:00pm");
             }
             continue;
           } else {
@@ -107,7 +109,7 @@ var grabRssFeed = function(url, callback, cacheBust, limit) {
 
         var mealSet = false;
         var endtime12hr = "";
-
+          
         $.each(cafe.dayparts[0], function (id, meal) { // for each meal
           // parse the dayparts of this meal into javascript dates
 
@@ -116,12 +118,12 @@ var grabRssFeed = function(url, callback, cacheBust, limit) {
           var starttime12hr = start.format('h:mm');
           var end = moment(meal.endtime,'HH:mm');
           endtime12hr = end.format('h:mm');
-
-
           var xnow = moment();
 
+          var startSuffix = "am";
           if (id == 0) {
-            cafeElement.find("a .dining-hall-block .hours-text").text(starttime12hr);
+              //ADD AM HERE
+            cafeElement.find("a .dining-hall-block .hours-text").text(starttime12hr+startSuffix);
           }
 
           // is this meal going on now?
@@ -133,9 +135,11 @@ var grabRssFeed = function(url, callback, cacheBust, limit) {
             return false;
           }
         });
+        var endSuffix = "pm";  
+          
         if (cafe.dayparts[0].length != 0) {
           console.log(key, " not closed");
-          cafeElement.find("a .dining-hall-block .hours-text").append(document.createTextNode(" - " + endtime12hr));
+          cafeElement.find("a .dining-hall-block .hours-text").append(document.createTextNode(" - " + endtime12hr+endSuffix));
           cafeElement.find("a").removeClass("ui-disabled");
         } else {
           console.log(key, " is closed");
